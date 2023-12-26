@@ -1,0 +1,32 @@
+{% extends '../base.html' %}
+
+{% block content %}
+{% for post in posts %}
+<div class="col-lg-8" style="margin-bottom: 50px;">
+    <!-- Post content-->
+    <article>
+        <!-- Post header-->
+        <header class="mb-4">
+            <!-- Post title-->
+            <h1 class="fw-bolder mb-1">{{ post.title|truncatewords:10|truncatechars:50 }}</h1>
+            <!-- Post meta content-->
+            <div class="text-muted fst-italic mb-2">{{ post.time_created|date:"F j, Y" }}
+              <a href="{% url 'user_profile' username=post.author.username %}">@{{post.author.username}}</a>
+            </div>
+            <!-- Post categories-->
+            <!-- <a class="badge bg-secondary text-decoration-none link-light" href="#!">Web Design</a>
+            <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a> -->
+        </header>
+        <!-- Preview image figure-->
+        {% if post.image %}
+        <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.image.url }}" alt="..." style="height: 325px;" /></figure>
+        {% endif %}
+        <!-- Post content-->
+        <section class="mb-5">
+            <p class="col-lg-10">{{ post.text|truncatewords:50|truncatechars:300 }}</p>
+        </section>
+        <a href="{% url 'post_detail' slug=post.slug %}" class="btn btn-dark">Подробнее</a>
+    </article>
+</div>
+{% endfor %}
+{% endblock content %}

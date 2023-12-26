@@ -1,0 +1,103 @@
+from django.db import models
+from django.contrib.auth.models import User
+from django.shortcuts import reverse
+
+
+# Create your models here.
+class Account(User):
+    phone_number = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True,
+        verbose_name="Номер телефона"
+    )
+    bio = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="О себе"
+    )
+    status = models.CharField(
+        max_length=60,
+        blank=True,
+        null=True,
+        verbose_name="Статус"
+    )
+
+    def __str__(self):
+        return f"{self.last_name} {self.first_name} @{self.username}"
+
+    def get_absolute_url(self):
+        return reverse('URI_OF_AN_ACCOUNT', kwargs={'username': self.username})  # FIXME
+
+    class Meta:
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
+        ordering = ("username", "first_name", "last_name")
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=255, verbose_name="Заголовок")
+
+    slug = models.SlugField(verbose_name="А тут лучше не трогать", unique=True)
+
+    text = models.TextField(verbose_name="Текст")
+
+    image = models.ImageField(
+        blank=True, null=True,
+        upload_to="posts_images",
+        verbose_name="Фото к посту")
+
+    time_created = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Время создания"
+    )
+    time_updated = models.DateTimeField(
+        auto_now=True, verbose_name="Последнее редактирование"
+    )
+
+    is_published = models.BooleanField(default=False, verbose_name="Опубликовать")
+
+    author = models.ForeignKey(
+        Account,
+        on_delete=models.CASCADE,
+        verbose_name="Автор поста"
+    )
+
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse('post_detail', kwargs={'slug': self.slug})
+
+    class Meta:
+        verbose_name = "Пост"
+        verbose_name_plural = "Посты"
+        ordering = ("-time_created", "title", "author")
+
+
+class Comment(models.Model):
+    text = models.TextField(verbose_name="Текст комментария")
+
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        verbose_name="Комментарий принадлежит этому посту"
+    )
+
+    author = models.ForeignKey(
+        Account,
+        on_delete=models.CASCADE,
+        verbose_name="Автор поста"
+    )
+
+    def __str__(self):
+        return f"{self.text}"[:50]
+
+    def get_absolute_url(self):
+        return reverse('URI_TO_POST', kwargs={'post': self.post.slug})  # FIXME
+
+    class Meta:
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"
+        ordering = ("post", "author")
+
