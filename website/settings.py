@@ -49,7 +49,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # my apps
     'general_stuff',
+    # exeternal
+    'crispy_forms',
+    'crispy_bootstrap5'
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRIPSY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -146,6 +153,6 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/'
-# LOGOUT_REDIRET_URL = 'login'
+LOGIN_REDIRECT_URL = '/home'
+LOGOUT_REDIRET_URL = '/login'
 
