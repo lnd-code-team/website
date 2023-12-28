@@ -1,6 +1,7 @@
 from django.views.generic import ListView, DetailView, View
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from . import models
+from django.contrib.auth import logout
 
 
 # Create your views here.
@@ -22,7 +23,7 @@ class PostDetailView(DetailView):
 
         return render(
             request,
-            "general_stuff/detail.html",
+            "general_stuff/post_detail.html",
             {
                 'title': slug,
                 'post': post
@@ -45,3 +46,7 @@ class PostCreateView(View):
     def post(self, request):
         pass
 
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')

@@ -4,7 +4,10 @@ from django.shortcuts import reverse
 
 
 # Create your models here.
-class Account(User):
+class UserInfo(models.Model):
+    user =  models.OneToOneField(
+        User, on_delete=models.CASCADE, verbose_name="Аккаунт"
+    )
     phone_number = models.CharField(
         max_length=15,
         blank=True,
@@ -24,15 +27,15 @@ class Account(User):
     )
 
     def __str__(self):
-        return f"{self.last_name} {self.first_name} @{self.username}"
+        return f"{self.user.last_name} {self.user.first_name} @{self.user.username}"
 
     def get_absolute_url(self):
         return reverse('URI_OF_AN_ACCOUNT', kwargs={'username': self.username})  # FIXME
 
     class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
-        ordering = ("username", "first_name", "last_name")
+        verbose_name = "Доп. инфо"
+        verbose_name_plural="Доп. инфо"
+        ordering = ("phone_number", )
 
 
 class Post(models.Model):
@@ -58,7 +61,7 @@ class Post(models.Model):
     is_published = models.BooleanField(default=False, verbose_name="Опубликовать")
 
     author = models.ForeignKey(
-        Account,
+        User,
         on_delete=models.CASCADE,
         verbose_name="Автор поста"
     )
@@ -85,9 +88,9 @@ class Comment(models.Model):
     )
 
     author = models.ForeignKey(
-        Account,
+        User,
         on_delete=models.CASCADE,
-        verbose_name="Автор поста"
+        verbose_name="Автор"
     )
 
     def __str__(self):
@@ -100,4 +103,3 @@ class Comment(models.Model):
         verbose_name = "Комментарий"
         verbose_name_plural = "Комментарии"
         ordering = ("post", "author")
-

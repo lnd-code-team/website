@@ -1,19 +1,17 @@
 from django.contrib import admin
-import django.contrib.auth.models as admin_models
 from . import models
 
 
 # Register your models here.
-@admin.register(models.Account)
-class AccountAdmin(admin.ModelAdmin):
-    list_display = (
-        'id', 'username',
-        'first_name', 'last_name',
-        'email', 'phone_number',
-        'is_staff'
-    )
+@admin.register(models.UserInfo)
+class UserInfoAdmin(admin.ModelAdmin):
+    list_display = ('phone_number', 'bio', 'status')
     list_display_links = [i for i in list_display]
-    search_fields = ('username', 'first_name', 'last_name', 'phone_number', 'bio')
+    search_fields = (
+        'phone_number', 'bio', 'status',
+        'user__username', 'user__first_name', 'user__last_name',
+        'user__email'
+        )
 
 
 @admin.register(models.Post)
@@ -45,8 +43,3 @@ class CommentAdmin(admin.ModelAdmin):
         'text',
         'author__username', 'author__first_name', 'author__last_name'
     )
-
-
-admin.site.unregister(admin_models.User)
-admin.site.unregister(admin_models.Group)
-
