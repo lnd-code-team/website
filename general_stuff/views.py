@@ -1,12 +1,15 @@
 from django.views.generic import ListView, DetailView, View
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
+from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from . import models
-from django.contrib.auth import logout
+from . import forms
 
 
 # Create your views here.
 class HomeListView(ListView):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         return render(
             request,
             "general_stuff/index.html",
@@ -18,9 +21,9 @@ class HomeListView(ListView):
 
 
 class PostDetailView(DetailView):
-    def get(self, request, slug, *args, **kwargs):
+    @method_decorator(login_required(login_url='/login'))
+    def get(self, request, slug):
         post = models.Post.objects.get(slug=slug)
-
         return render(
             request,
             "general_stuff/post_detail.html",
@@ -32,21 +35,37 @@ class PostDetailView(DetailView):
 
 
 class UserProfileView(View):
-    def get(self, request, username, *args, **kwargs):
+    @method_decorator(login_required(login_url='/login'))
+    def get(self, request, username):
         pass
 
+    @method_decorator(login_required(login_url='/login'))
     def post(self, request):
         pass
 
 
 class PostCreateView(View):
+    @method_decorator(login_required(login_url='/login'))
     def get(self, request):
         return render(request, 'post_create.html')
 
+    @method_decorator(login_required(login_url='/login'))
     def post(self, request):
         pass
 
 
 def logout_user(request):
     logout(request)
-    return redirect('login')
+    return redirect('login', permanent=True)
+
+
+def sign_up(request):
+    if request.method == 'POST':
+        form = forms.RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return reverse('home')
+    else:
+        form = forms.RegisterForm()
+    return render(request, 'registration/sign_up.html', {"form": form})

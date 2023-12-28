@@ -16,7 +16,7 @@
                     <h1 class="fw-bolder mb-1">{{ post.title }}</h1>
                     <!-- Post meta content-->
                     <div class="text-muted fst-italic mb-2">{{ post.time_created|date:"F j, Y" }}
-                      <a href="{% url 'user_profile' username=post.author.username %}">@{{post.author.username}}</a>
+                      <a href="{% url 'user-profile' post.author.username %}">@{{post.author.username}}</a>
                     </div>
                 </header>
                 <!-- Preview image figure-->

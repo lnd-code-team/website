@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>{% block title %} {% endblock %}</title>
+        <title>{% block title %}{% endblock %}</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
         <!-- Core theme CSS (includes Bootstrap)-->
@@ -24,18 +24,21 @@
                         <li class="nav-item"><a class="nav-link" href="/#top">Домой</a></li>
                         <li class="nav-item"><a class="nav-link" href="#!">Обратная свзяь</a></li>
                         {% if user.is_staff %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'post_create' %}">Написать пост</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'post-create' %}">Написать пост</a></li>
                         {% endif %}
                         {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url 'user_profile' user.username %}">{{ user.username }}</a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'user-profile' user.username %}">{{ user.username }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="{% url 'logout' %}">Выйти</a>
                         </li>
                         {% else %}
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Вход</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/sign-up">Регистрация</a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'sign-up' %}">Регистрация</a>
                         </li>
                         {% endif %}
                     </ul>

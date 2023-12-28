@@ -50,11 +50,11 @@ class Post(models.Model):
         upload_to="posts_images",
         verbose_name="Фото к посту")
 
-    time_created = models.DateTimeField(
+    created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Время создания"
     )
-    time_updated = models.DateTimeField(
+    updated_at = models.DateTimeField(
         auto_now=True, verbose_name="Последнее редактирование"
     )
 
@@ -75,7 +75,7 @@ class Post(models.Model):
     class Meta:
         verbose_name = "Пост"
         verbose_name_plural = "Посты"
-        ordering = ("-time_created", "title", "author")
+        ordering = ("-created_at", "title", "author")
 
 
 class Comment(models.Model):

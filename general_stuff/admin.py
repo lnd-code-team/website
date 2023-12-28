@@ -19,7 +19,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'title',
         'author',
-        'time_created', 'time_updated',
+        'created_at', 'updated_at',
         'is_published'
     )
     list_display_links = [i for i in list_display]
