@@ -5,7 +5,7 @@ from . import models
 # Register your models here.
 @admin.register(models.UserInfo)
 class UserInfoAdmin(admin.ModelAdmin):
-    list_display = ('phone_number', 'bio', 'status')
+    list_display = ('user', 'phone_number', 'bio', 'status')
     list_display_links = [i for i in list_display]
     search_fields = (
         'phone_number', 'bio', 'status',

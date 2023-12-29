@@ -12,6 +12,7 @@ class UserInfo(models.Model):
         max_length=15,
         blank=True,
         null=True,
+        unique=True,
         verbose_name="Номер телефона"
     )
     bio = models.TextField(
@@ -25,12 +26,16 @@ class UserInfo(models.Model):
         null=True,
         verbose_name="Статус"
     )
+    avatar = models.ImageField(
+        blank=True, null=True,
+        upload_to='avatar', verbose_name="Аватарка"
+        )
 
     def __str__(self):
         return f"{self.user.last_name} {self.user.first_name} @{self.user.username}"
 
     def get_absolute_url(self):
-        return reverse('URI_OF_AN_ACCOUNT', kwargs={'username': self.username})  # FIXME
+        return reverse('user-profile', kwargs={'username': self.user})
 
     class Meta:
         verbose_name = "Доп. инфо"
@@ -70,7 +75,7 @@ class Post(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('post_detail', kwargs={'slug': self.slug})
+        return reverse('post-detail', kwargs={'slug': self.slug})
 
     class Meta:
         verbose_name = "Пост"
@@ -97,7 +102,7 @@ class Comment(models.Model):
         return f"{self.text}"[:50]
 
     def get_absolute_url(self):
-        return reverse('URI_TO_POST', kwargs={'post': self.post.slug})  # FIXME
+        return reverse('post-detail', kwargs={'post': self.post.slug})
 
     class Meta:
         verbose_name = "Комментарий"

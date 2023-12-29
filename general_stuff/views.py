@@ -1,8 +1,10 @@
 from django.views.generic import ListView, DetailView, View
-from django.shortcuts import render, redirect, reverse
-from django.contrib.auth import logout, login, authenticate
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
+from django.contrib import messages
 from . import models
 from . import forms
 
@@ -21,25 +23,38 @@ class HomeListView(ListView):
 
 
 class PostDetailView(DetailView):
-    @method_decorator(login_required(login_url='/login'))
     def get(self, request, slug):
-        post = models.Post.objects.get(slug=slug)
-        return render(
-            request,
-            "general_stuff/post_detail.html",
-            {
-                'title': slug,
-                'post': post
-            }
-        )
+        if request.user.is_authenticated:
+            post = models.Post.objects.get(slug=slug)
+            return render(
+                request,
+                "general_stuff/post_detail.html",
+                {
+                    'title': slug,
+                    'post': post
+                }
+            )
+        messages.warning(request, 'Этот контент требует авторизации.')
+        return redirect('/login')
 
 
 class UserProfileView(View):
-    @method_decorator(login_required(login_url='/login'))
     def get(self, request, username):
-        pass
+        if request.user.is_authenticated:
 
-    @method_decorator(login_required(login_url='/login'))
+            main_data = get_object_or_404(User, username=username)
+            rest_data = main_data.userinfo
+            
+            return render(
+                request,
+                "general_stuff/user_profile.html",
+                {
+                    "title": username,
+                    "main_data": main_data,
+                    "rest_data": rest_data
+                }
+            )
+
     def post(self, request):
         pass
 
@@ -56,6 +71,7 @@ class PostCreateView(View):
 
 def logout_user(request):
     logout(request)
+    messages.info(request, 'Вы вышли из системы')
     return redirect('login', permanent=True)
 
 
@@ -65,7 +81,8 @@ def sign_up(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return reverse('home')
+            messages.success(request, 'Аккаунт успешно создан')
+            return redirect('/', permanent=True)
     else:
         form = forms.RegisterForm()
     return render(request, 'registration/sign_up.html', {"form": form})

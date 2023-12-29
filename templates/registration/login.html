@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Вход{% endblock title%}
-
 {% load crispy_forms_tags %}
 
+{% block title %}Вход{% endblock title%}
+
 {% block content %}
+
+{% include 'messages.html' %}
 <form method="post">
   {% csrf_token %} {{ form|crispy }}
-
   <p>Нет аккаунта? Создайте <a href="{% url 'sign-up' %}">здесь</a>!</p>
   <button type="submit" class="btn btn-success" style="margin-bottom: 30%;">Вход</button>
-
 </form>
+
 {% endblock content %}
