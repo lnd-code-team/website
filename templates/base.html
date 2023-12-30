@@ -37,7 +37,7 @@
                         {% endif %}
                         {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{% url 'user-profile' user.username %}">{{ user.username }}</a>
+                            <a class="nav-link active" aria-current="page" href="{% url 'user-profile' user.username %}"><u>{{ user.username }}</u></a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="{% url 'logout' %}">Выйти</a>

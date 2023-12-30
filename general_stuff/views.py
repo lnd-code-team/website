@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.contrib import messages
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from . import models
 from . import forms
 
@@ -54,6 +56,8 @@ class UserProfileView(View):
                     "rest_data": rest_data
                 }
             )
+        messages.warning(request, "Этот контент требует авторизации.")
+        return redirect('/login')
 
     def post(self, request):
         pass
@@ -75,14 +79,30 @@ def logout_user(request):
     return redirect('login', permanent=True)
 
 
-def sign_up(request):
-    if request.method == 'POST':
+class SignUp(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            messages.warning(request, 'Вы уже в системе!')
+            return redirect('/')
+        
+        form = forms.RegisterForm()
+        return render(request, 'registration/sign_up.html', {"form": form})
+
+    def post(self, request):
         form = forms.RegisterForm(request.POST)
+
         if form.is_valid():
             user = form.save()
             login(request, user)
+
+            # Creating user info instance
+            userinfo = models.UserInfo(
+                user=user,
+                user_id=user.id,
+            )
+            userinfo.save()
+
             messages.success(request, 'Аккаунт успешно создан')
             return redirect('/', permanent=True)
-    else:
-        form = forms.RegisterForm()
-    return render(request, 'registration/sign_up.html', {"form": form})
+
+        return render(request, 'registration/sign_up.html', {"form": form})

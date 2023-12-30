@@ -12,7 +12,6 @@ class UserInfo(models.Model):
         max_length=15,
         blank=True,
         null=True,
-        unique=True,
         verbose_name="Номер телефона"
     )
     bio = models.TextField(
@@ -29,7 +28,45 @@ class UserInfo(models.Model):
     avatar = models.ImageField(
         blank=True, null=True,
         upload_to='avatar', verbose_name="Аватарка"
+    )
+    inst = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Инстаграм"
         )
+    telegram = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Телеграм"
+        )
+    github = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Гитхаб"
+        )
+    pinterest = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Пинтерест"
+        )
+    facebook = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Фейсбук"
+        )
+    linkedin = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Линкед Ин"
+        )
+    
+
 
     def __str__(self):
         return f"{self.user.last_name} {self.user.first_name} @{self.user.username}"

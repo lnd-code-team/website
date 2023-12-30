@@ -5,6 +5,9 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+
+{% include 'messages.html' %}
+
 <form method="post">
   {% csrf_token %} {{ form|crispy }}
 

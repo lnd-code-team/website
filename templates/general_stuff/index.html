@@ -5,6 +5,13 @@ Legends Never Die
 {% endblock %}
 
 {% block content %}
+
+{% if messages %}
+<div style="margin-bottom: 1%;">
+    {% include 'messages.html' %}
+</div>
+{% endif %}
+
 {% for post in posts %}
 <div class="col-lg-8" style="margin-bottom: 50px;">
     <!-- Post content-->
@@ -23,7 +30,7 @@ Legends Never Die
         </header>
         <!-- Preview image figure-->
         {% if post.image %}
-        <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.image.url }}" alt="..." style="height: 325px;" /></figure>
+        <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.image.url }}" style="height: 325px;" /></figure>
         {% endif %}
         <!-- Post content-->
         <section class="mb-5">
