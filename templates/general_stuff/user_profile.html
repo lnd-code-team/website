@@ -104,43 +104,43 @@
     {% if rest_data.inst %}
     <li class="list-group-item d-flex align-items-center flex-wrap text-center">
         <img src="{% static 'assets/instagram.svg' %}" />
-        <h6 class="mb-0">Instagram</h6>
-        <span class="text-secondary">{{ rest_data.inst }}</span>
+        <h6 class="mb-0">Instagram</h6> <span style="visibility: hidden;">-</span>
+        <span class="text-secondary"><a href="{{ rest_data.inst }}">{{ rest_data.inst }}</a></span>
     </li>
     {% endif %}
     {% if rest_data.telegram %}
     <li class="list-group-item d-flex align-items-center flex-wrap text-center">
         <img src="{% static 'assets/telegram.svg' %}" />
-        <h6 class="mb-0">Telegram</h6>
-        <span class="text-secondary">{{ rest_data.telegram }}</span>
+        <h6 class="mb-0">Telegram</h6> <span style="visibility: hidden;">-</span>
+        <span class="text-secondary"><a href="{{ rest_data.telegram }}">{{ rest_data.telegram }}</a></span>
     </li>
     {% endif %}
     {% if rest_data.github %}
     <li class="list-group-item d-flex align-items-center flex-wrap text-center">
         <img src="{% static 'assets/github.svg' %}" />
-        <h6 class="mb-0">Github</h6>
-        <span class="text-secondary">{{ rest_data.github }}</span>
+        <h6 class="mb-0">Github</h6> <span style="visibility: hidden;">-</span>
+        <span class="text-secondary"><a href="{{ rest_data.github }}">{{ rest_data.github }}</a></span>
     </li>
     {% endif %}
     {% if rest_data.pinterest %}
     <li class="list-group-item d-flex align-items-center flex-wrap text-center">
         <img src="{% static 'assets/pinterest.svg' %}" />
-        <h6 class="mb-0">Pinterest</h6>
-        <span class="text-secondary">{{ rest_data.pinterest }}</span>
+        <h6 class="mb-0">Pinterest</h6> <span style="visibility: hidden;">-</span>
+        <span class="text-secondary"><a href="{{ rest_data.pinterest }}">{{ rest_data.pinterest }}</a></span>
     </li>
     {% endif %}
     {% if rest_data.facebook %}
     <li class="list-group-item d-flex align-items-center flex-wrap text-center">
         <img src="{% static 'assets/facebook.svg' %}" />
-        <h6 class="mb-0">Facebook</h6>
-        <span class="text-secondary">{{ rest_data.facebook }}</span>
+        <h6 class="mb-0">Facebook</h6> <span style="visibility: hidden;">-</span>
+        <span class="text-secondary"><a href="{{ rest_data.facebook }}">{{ rest_data.facebook }}</a></span>
     </li>
     {% endif %}
     {% if rest_data.linkedin %}
     <li class="list-group-item d-flex align-items-center flex-wrap text-center">
         <img src="{% static 'assets/linkedin.svg' %}" />
-        <h6 class="mb-0">LinkedIn</h6>
-        <span class="text-secondary">{{ rest_data.linkedin }}</span>
+        <h6 class="mb-0">LinkedIn</h6> <span style="visibility: hidden;">-</span>
+        <span class="text-secondary"><a href="{{ rest_data.linkedin }}">{{ rest_data.linkedin }}</a></span>
     </li>
     {% endif %} 
 </ul>

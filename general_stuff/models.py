@@ -33,41 +33,39 @@ class UserInfo(models.Model):
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="Инстаграм"
+        verbose_name="Instagram"
         )
     telegram = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="Телеграм"
+        verbose_name="Telegram"
         )
     github = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="Гитхаб"
+        verbose_name="Github"
         )
     pinterest = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="Пинтерест"
+        verbose_name="Pinterest"
         )
     facebook = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="Фейсбук"
+        verbose_name="Facebook"
         )
     linkedin = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="Линкед Ин"
+        verbose_name="LinkedIn"
         )
     
-
-
     def __str__(self):
         return f"{self.user.last_name} {self.user.first_name} @{self.user.username}"
 
