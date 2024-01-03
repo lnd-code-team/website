@@ -9,4 +9,6 @@ urlpatterns = [
     path('sign-up/', views.SignUp.as_view(), name='sign-up'),
     path('posts/<slug:slug>/', views.PostDetailView.as_view(), name='post-detail'),
     path('post-create/', views.PostCreateView.as_view(), name='post-create'),
+    path('post-update/<slug:slug>/', views.PostUpdateView.as_view(), name='post-update'),
+    path('post-delete/<slug:slug>/', views.delete_post, name='post-delete'),
 ]

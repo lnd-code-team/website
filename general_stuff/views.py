@@ -1,11 +1,63 @@
-from django.views.generic import ListView, DetailView, View, CreateView
+from uuid import uuid4
+from django.views.generic import ListView, DetailView, View, CreateView, UpdateView, DeleteView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout, login
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.utils.text import slugify
 from . import models
 from . import forms
+
+RUSSIAN_TO_ENGLISH = {
+    "а": "a",
+    "б": "b",
+    "в": "v",
+    "г": "g",
+    "д": "d",
+    "е": "e",
+    "ё": "yo",
+    "ж": "zh",
+    "з": "z",
+    "и": "i",
+    "й": "y",
+    "к": "k",
+    "л": "l",
+    "м": "m",
+    "н": "n",
+    "о": "o",
+    "п": "p",
+    "р": "r",
+    "с": "s",
+    "т": "t",
+    "у": "u",
+    "ф": "f",
+    "х": "x",
+    "ц": "c",
+    "ч": "ch",
+    "ш": "sh",
+    "щ": "shch",
+    "ъ": "",
+    "ы": "y",
+    "ь": "",
+    "э": "e",
+    "ю": "yu",
+    "я": "ya",
+}
+
+
+def generate_slug(title):
+    title = title.lower()
+    for russian, english in RUSSIAN_TO_ENGLISH.items():
+        title = title.replace(russian, english)
+    title = '-'.join(title.split())
+    if models.Post.objects.filter(slug=title).exists():
+        title += '-' + str(uuid4())
+    return title
+
+
+def logout_user(request):
+    logout(request)
+    messages.info(request, 'До скорой встречи :D')
+    return redirect('/', permanent=True)
 
 
 # Create your views here.
@@ -37,6 +89,75 @@ class PostDetailView(DetailView):
         return redirect('/login')
 
 
+class PostCreateView(CreateView):
+    form_class = forms.PostCreateForm
+
+    def get(self, request):
+        if request.user.is_authenticated and request.user.is_staff:
+            return render(request, 'general_stuff/post_create.html', {'form': self.form_class})
+        elif request.user.is_authenticated and not request.user.is_staff:
+            messages.warning(request, "А ты не являешься админом, дружок :D")
+            return redirect('/')
+        
+        messages.warning(request, "Это действие требует авторизации!")
+        return redirect('/login')
+
+    def post(self, request):
+        if request.user.is_authenticated and request.user.is_staff:
+
+            form = self.form_class(request.POST or None, request.FILES or None)
+            if form.is_valid():
+
+                # Fetching data from form
+                title = form.cleaned_data['title']
+                text = form.cleaned_data['text']
+                image = form.cleaned_data['image']
+                is_published = form.cleaned_data['is_published']
+                author = request.user
+                slug = generate_slug(title)
+
+                # Create an instance of post
+                models.Post.objects.create(
+                    title=title[:49], text=text, image=image, is_published=is_published, author=author, slug=slug
+                )
+                
+                # Case success
+                messages.success(request, 'Пост успешно создан!')
+                return redirect('/')
+            
+            # Case form invalid
+            messages.warning(request, 'Ошибка в передаваемых данных!')
+            return render(request, 'general_stuff/post_create.html', {'form': form})
+        
+        # Case forbidden
+        messages.warning(request, 'Воу воу воу... Куда это мы так спешим, ковбой!?')
+        return render(request, 'general_stuff/post-create.html')
+    
+
+class PostUpdateView(UpdateView):
+    def get(self, request, slug):
+        pass
+
+    def post(self, request, slug):
+        pass
+
+
+def delete_post(request, slug):
+    post = models.Post.objects.get(slug=slug)
+    
+    if post and request.user.is_authenticated and request.user.is_staff:
+        post.delete()
+        messages.success(request, "Пост был успешно удален.")
+        return redirect('/', permanent=True)
+        
+    elif post and not request.user.is_staff:
+        messages.warning(request, "А куда это мы лезем?)")
+        return redirect("/", permanent=True)
+
+    messages.warning(request, "Такого поста нет, удалять нечего!")
+    return redirect("/", permanent=True)
+
+
 class UserProfileView(View):
     def get(self, request, username):
         if request.user.is_authenticated:
@@ -55,56 +176,6 @@ class UserProfileView(View):
             )
         messages.warning(request, "Этот контент требует авторизации!")
         return redirect('/login')
-
-    def post(self, request):
-        pass
-
-
-class PostCreateView(CreateView):
-    form_class = forms.PostCreateForm
-
-    def get(self, request):
-        if request.user.is_authenticated and request.user.is_staff:
-            return render(request, 'general_stuff/post_create.html', {'form': self.form_class})
-        elif request.user.is_authenticated and not request.user.is_staff:
-            messages.warning(request, "А ты не являешься админом, дружок :D")
-            return redirect('/')
-        
-        messages.warning(request, "Это действие требует авторизации!")
-        return redirect('/login')
-
-    def post(self, request):
-        if request.user.is_authenticated and request.user.is_staff:
-            form = self.form_class(request.POST or None, request.FILES or None)
-            if form.is_valid():
-                title = form.cleaned_data['title']
-                text = form.cleaned_data['text']
-                image = form.cleaned_data['image']
-                is_published = form.cleaned_data['is_published']
-                author = request.user
-                slug = slugify(title)
-                print(title)
-                print('\n\n\nSLUG', slug, 'SLUG\n\n\n')
-                
-                # Create an instance of post
-                models.Post.objects.create(
-                    title=title, text=text, image=image, is_published=is_published, author=author, slug=slug
-                )
-                
-                messages.success(request, 'Пост успешно создан!')
-                return redirect('/')
-
-            messages.danger(request, 'Ошибка в передаваемых данных!')
-            return render(request, 'general_stuff/post_create.html', {'form': form})
-        
-        messages.danger(request, 'Воу воу воу... Куда это мы так спешим, ковбой!?')
-        return render(request, 'general_stuff/post-create.html')
-
-
-def logout_user(request):
-    logout(request)
-    messages.info(request, 'Вы вышли из системы')
-    return redirect('login', permanent=True)
 
 
 class SignUp(View):
@@ -130,7 +201,10 @@ class SignUp(View):
             )
             userinfo.save()
 
-            messages.success(request, 'Аккаунт успешно создан!')
+            # Case success
+            messages.success(request, f'Добро пожаловать, {user}!')
             return redirect('/', permanent=True)
-
+        
+        # Case form invalid
+        messages.warning(request, "Ошибка в заполнении формы!")
         return render(request, 'registration/sign_up.html', {"form": form})

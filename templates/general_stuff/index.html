@@ -34,7 +34,7 @@ Legends Never Die
         {% endif %}
         <!-- Post content-->
         <section class="mb-5">
-            <p class="col-lg-10">{{ post.text|truncatewords:50|truncatechars:300 }}</p>
+            <p class="col-lg-10" style="width: 90%;">{{ post.text|truncatewords:50|truncatechars:300 }}</p>
         </section>
         <a href="{% url 'post-detail' post.slug %}" class="btn btn-dark">Подробнее</a>
     </article>

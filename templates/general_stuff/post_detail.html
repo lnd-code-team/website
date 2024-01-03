@@ -15,16 +15,24 @@
                     <!-- Post title-->
                     <h1 class="fw-bolder mb-1">{{ post.title }}</h1>
                     <!-- Post meta content-->
-                    <div class="text-muted fst-italic mb-2">{{ post.time_created|date:"F j, Y" }}
+                    <div class="text-muted fst-italic mb-2">{{ post.created_at|date:"F j, Y" }} <br>
                       <a href="{% url 'user-profile' post.author.username %}">@{{post.author.username}}</a>
                     </div>
+                    {% if user.is_staff %}
+                        <a href="{% url 'post-update' post.slug %}" class="btn btn-success">
+                            Править
+                        </a>
+                        <a href="{% url 'post-delete' post.slug %}" class="btn btn-danger">
+                            Удалить
+                        </a>                                
+                    {% endif %}
                 </header>
                 <!-- Preview image figure-->
                 {% if post.image %}
                 <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.image.url }}" alt="..." style="width:90%;" /></figure>
                 {% endif %}
                 <!-- Post content-->
-                <section class="mb-5">
+                <section class="mb-5" style="width: 90%;">
                     <p>{{ post.text }}</p>
                 </section>
             </article>

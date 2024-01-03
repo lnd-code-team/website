@@ -79,7 +79,7 @@ class UserInfo(models.Model):
 
 
 class Post(models.Model):
-    title = models.CharField(max_length=255, verbose_name="Заголовок")
+    title = models.CharField(max_length=50, verbose_name="Заголовок")
 
     slug = models.SlugField(verbose_name="А тут лучше не трогать", unique=True)
 
