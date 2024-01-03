@@ -16,3 +16,9 @@ class PostCreateForm(forms.ModelForm):
     class Meta:
         model = models.Post
         fields =  ['title', 'text', 'image', 'is_published']
+
+
+class PostUpdateForm(forms.ModelForm):
+    class Meta:
+        model = models.Post
+        fields =  ['title', 'text', 'image', 'is_published']

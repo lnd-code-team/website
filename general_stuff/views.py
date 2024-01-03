@@ -1,6 +1,8 @@
+import re
 from uuid import uuid4
-from django.views.generic import ListView, DetailView, View, CreateView, UpdateView, DeleteView
-from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import ListView, DetailView, View, CreateView, UpdateView
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.contrib.auth import logout, login
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -46,9 +48,13 @@ RUSSIAN_TO_ENGLISH = {
 
 def generate_slug(title):
     title = title.lower()
+
     for russian, english in RUSSIAN_TO_ENGLISH.items():
         title = title.replace(russian, english)
+    
     title = '-'.join(title.split())
+    title = re.sub(r'[^\w\-]', '', title)
+
     if models.Post.objects.filter(slug=title).exists():
         title += '-' + str(uuid4())
     return title
@@ -60,7 +66,7 @@ def logout_user(request):
     return redirect('/', permanent=True)
 
 
-# Create your views here.
+# Views
 class HomeListView(ListView):
     def get(self, request):
         return render(
@@ -135,11 +141,28 @@ class PostCreateView(CreateView):
     
 
 class PostUpdateView(UpdateView):
-    def get(self, request, slug):
-        pass
+    model = models.Post
+    form_class = forms.PostUpdateForm
+    template_name = 'general_stuff/post_update.html'
 
-    def post(self, request, slug):
-        pass
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, 'Статья успешно сохранена.')
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('post-detail', kwargs={'slug': self.object.slug})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if not self.request.user.is_staff:
+            messages.warning(self.request, 'У вас нет прав на редактирование этой статьи.')
+
+        context['success_url'] = reverse('post-detail', kwargs={'slug': self.object.slug})
+
+        return context
 
 
 def delete_post(request, slug):
