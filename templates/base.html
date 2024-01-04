@@ -35,6 +35,9 @@
                         {% if user.is_staff %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'post-create' %}">Написать пост</a></li>
                         {% endif %}
+                        {% if user.is_staff %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'posts' %}">Все посты</a></li>
+                        {% endif %}
                         {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="{% url 'user-profile' user.username %}"><u>{{ user.username }}</u></a>

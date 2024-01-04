@@ -1,7 +1,7 @@
 {% extends '../base.html' %}
 
 {% block title %}
-Legends Never Die
+Все посты
 {% endblock %}
 
 {% block content %}
@@ -11,7 +11,7 @@ Legends Never Die
 </div>
 
 {% for post in posts %}
-<div class="col-lg-8" style="margin-bottom: 50px;">
+<div class="col-lg-6" style="margin-bottom: 50px;">
     <!-- Post content-->
     <article>
         <!-- Post header-->
@@ -29,13 +29,19 @@ Legends Never Die
         {% endif %}
         <!-- Post content-->
         <section class="mb-5">
-            <p class="col-lg-10" style="width: 90%;">{{ post.text|truncatewords:50|truncatechars:300 }}</p>
+            <p class="col-lg-10" style="width: 90%;">{{ post.text|truncatewords:10|truncatechars:50 }}</p>
         </section>
         <a href="{% url 'post-detail' post.slug %}" class="btn btn-dark">Подробнее</a>
+        {% if user.is_staff %}
+            <a href="{% url 'post-update' post.slug %}" class="btn btn-success">
+                Править
+            </a>
+            <a href="{% url 'post-delete' post.slug %}" class="btn btn-danger">
+                Удалить
+            </a>                                
+        {% endif %}
     </article>
 </div>
 {% endfor %}
-
-{% include "side_widget.html" %}
 
 {% endblock %}

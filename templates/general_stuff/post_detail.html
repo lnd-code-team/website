@@ -6,7 +6,9 @@
 
 {% block content %}
 
-{% include 'messages.html' %}
+<div style="margin-bottom: 1%;">
+    {% include 'messages.html' %}
+</div>
 
 <div class="container mt-5">
     <div class="row">
@@ -18,8 +20,8 @@
                     <!-- Post title-->
                     <h1 class="fw-bolder mb-1">{{ post.title }}</h1>
                     <!-- Post meta content-->
-                    <div class="text-muted fst-italic mb-2">{{ post.created_at|date:"F j, Y" }} <br>
-                      <a href="{% url 'user-profile' post.author.username %}">@{{post.author.username}}</a>
+                    <div class="text-muted fst-italic mb-2">{{ post.created_at|date:"F j, Y" }}
+                      <a class="text-decoration-none" href="{% url 'user-profile' post.author.username %}">@{{post.author.username}}</a>
                     </div>
                     {% if user.is_staff %}
                         <a href="{% url 'post-update' post.slug %}" class="btn btn-success">

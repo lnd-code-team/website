@@ -1,7 +1,6 @@
 import re
 from uuid import uuid4
-from django.views.generic import ListView, DetailView, View, CreateView, UpdateView
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.views.generic import DetailView, View, CreateView, UpdateView, ListView
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.contrib.auth import logout, login
 from django.contrib.auth.models import User
@@ -63,19 +62,16 @@ def generate_slug(title):
 def logout_user(request):
     logout(request)
     messages.info(request, 'До скорой встречи :D')
-    return redirect('/', permanent=True)
+    return redirect('/login', permanent=True)
 
 
 # Views
-class HomeListView(ListView):
+class HomeView(View):
     def get(self, request):
         return render(
             request,
             "general_stuff/index.html",
-            {
-                'title': 'Legends Neve Die',
-                'posts': models.Post.objects.filter(is_published=True)
-            }
+            {'posts': models.Post.objects.filter(is_published=True)}
         )
 
 
@@ -99,17 +95,17 @@ class PostCreateView(CreateView):
     form_class = forms.PostCreateForm
 
     def get(self, request):
-        if request.user.is_authenticated and request.user.is_staff:
+        if request.user.is_staff:
             return render(request, 'general_stuff/post_create.html', {'form': self.form_class})
-        elif request.user.is_authenticated and not request.user.is_staff:
-            messages.warning(request, "А ты не являешься админом, дружок :D")
+        elif not request.user.is_staff:
+            messages.warning(request, "У вас нет прав для достижения данного ресурса.")
             return redirect('/')
         
         messages.warning(request, "Это действие требует авторизации!")
         return redirect('/login')
 
     def post(self, request):
-        if request.user.is_authenticated and request.user.is_staff:
+        if request.user.is_staff:
 
             form = self.form_class(request.POST or None, request.FILES or None)
             if form.is_valid():
@@ -136,7 +132,7 @@ class PostCreateView(CreateView):
             return render(request, 'general_stuff/post_create.html', {'form': form})
         
         # Case forbidden
-        messages.warning(request, 'Воу воу воу... Куда это мы так спешим, ковбой!?')
+        messages.warning(request, 'У вас нет прав для достижения данного ресурса.')
         return render(request, 'general_stuff/post-create.html')
     
 
@@ -163,21 +159,33 @@ class PostUpdateView(UpdateView):
         context['success_url'] = reverse('post-detail', kwargs={'slug': self.object.slug})
 
         return context
+    
+
+class PostListView(View):
+    def get(self, request):
+        if request.user.is_staff:
+            posts = models.Post.objects.all()
+            return render(request, "general_stuff/posts.html", {"posts": posts})
+
+        # Case forbidden
+        messages.warning(request, "У вас нет прав для достижения данного ресурса.")
+        return redirect('/', permanent=True)
 
 
 def delete_post(request, slug):
-    post = models.Post.objects.get(slug=slug)
-    
-    if post and request.user.is_authenticated and request.user.is_staff:
+    if request.user.is_staff:
+        try:
+            post = models.Post.objects.get(slug=slug)
+        except Exception:
+            messages.warning(request, "Ресурс не существует!")
+            return redirect('/', permanent=True)
+
         post.delete()
         messages.success(request, "Пост был успешно удален.")
-        return redirect('/', permanent=True)
-        
-    elif post and not request.user.is_staff:
-        messages.warning(request, "А куда это мы лезем?)")
-        return redirect("/", permanent=True)
+        return redirect('/posts', permanent=True)
 
-    messages.warning(request, "Такого поста нет, удалять нечего!")
+    # Case forbidden
+    messages.warning(request, "У вас нет прав для достижения данного ресурса.")
     return redirect("/", permanent=True)
 
 

@@ -6,7 +6,10 @@
 
 {% block content %}
 
-{% include 'messages.html' %}
+<div style="margin-bottom: 1%;">
+  {% include 'messages.html' %}
+</div>
+
 <form method="post">
   {% csrf_token %} {{ form|crispy }}
   <p>Нет аккаунта? Создайте <a href="{% url 'sign-up' %}">здесь</a>!</p>
