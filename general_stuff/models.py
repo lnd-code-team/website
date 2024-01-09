@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import reverse
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 # Create your models here.
@@ -8,7 +9,7 @@ class UserInfo(models.Model):
     user =  models.OneToOneField(
         User, on_delete=models.CASCADE, verbose_name="Аккаунт"
     )
-    phone_number = models.CharField(
+    phone_number = PhoneNumberField(
         max_length=15,
         blank=True,
         null=True,
@@ -27,47 +28,12 @@ class UserInfo(models.Model):
     )
     avatar = models.ImageField(
         blank=True, null=True,
-        upload_to='avatar', verbose_name="Аватарка"
+        upload_to='avatars', verbose_name="Аватарка"
     )
-    inst = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name="Instagram"
-        )
-    telegram = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name="Telegram"
-        )
-    github = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name="Github"
-        )
-    pinterest = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name="Pinterest"
-        )
-    facebook = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name="Facebook"
-        )
-    linkedin = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name="LinkedIn"
-        )
-    
+    dream_team = models.BooleanField(blank=True, default=False)
+
     def __str__(self):
-        return f"{self.user.last_name} {self.user.first_name} @{self.user.username}"
+        return f"{self.user.username}"
 
     def get_absolute_url(self):
         return reverse('user-profile', kwargs={'username': self.user})
@@ -81,7 +47,7 @@ class UserInfo(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=50, verbose_name="Заголовок")
 
-    slug = models.SlugField(verbose_name="А тут лучше не трогать", unique=True)
+    slug = models.SlugField(verbose_name="Ссылка автоматически составленная из заголовка", unique=True)
 
     text = models.TextField(verbose_name="Текст")
 
@@ -134,7 +100,7 @@ class Comment(models.Model):
     )
 
     def __str__(self):
-        return f"{self.text}"[:50]
+        return f"{self.text}"
 
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'post': self.post.slug})
@@ -143,3 +109,8 @@ class Comment(models.Model):
         verbose_name = "Комментарий"
         verbose_name_plural = "Комментарии"
         ordering = ("post", "author")
+
+
+class Tagline(models.Model):
+    title = models.CharField(max_length=255, verbose_name="Заголовок")
+    text = models.TextField(max_length=255, verbose_name="Текст")

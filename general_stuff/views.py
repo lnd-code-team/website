@@ -1,6 +1,6 @@
 import re
 from uuid import uuid4
-from django.views.generic import DetailView, View, CreateView, UpdateView, ListView
+from django.views.generic import DetailView, View, CreateView, UpdateView
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.contrib.auth import logout, login
 from django.contrib.auth.models import User
@@ -8,6 +8,10 @@ from django.contrib import messages
 from . import models
 from . import forms
 
+FORBIDDEN = "У вас недостаточно прав для открытия данного ресурса."
+AUTHORIZATION_REQUIRED = "Этот контент требует авторизации."
+FORM_INVALID = "Ошибка в заполнении формы."
+NO_URL = "Ресурс не существует!"
 RUSSIAN_TO_ENGLISH = {
     "а": "a",
     "б": "b",
@@ -71,7 +75,11 @@ class HomeView(View):
         return render(
             request,
             "general_stuff/index.html",
-            {'posts': models.Post.objects.filter(is_published=True)}
+            {
+                'posts': models.Post.objects.filter(is_published=True),
+                'tagline': get_object_or_404(models.Tagline, id=1),
+                'dreamteam': models.UserInfo.objects.filter(dream_team=True),
+            }
         )
 
 
@@ -84,10 +92,12 @@ class PostDetailView(DetailView):
                 "general_stuff/post_detail.html",
                 {
                     'title': slug,
-                    'post': post
+                    'post': post,
+                    'tagline': get_object_or_404(models.Tagline, id=1),
+                    'dreamteam': models.UserInfo.objects.filter(dream_team=True),
                 }
             )
-        messages.warning(request, 'Этот контент требует авторизации!')
+        messages.warning(request, AUTHORIZATION_REQUIRED)
         return redirect('/login')
 
 
@@ -98,10 +108,10 @@ class PostCreateView(CreateView):
         if request.user.is_staff:
             return render(request, 'general_stuff/post_create.html', {'form': self.form_class})
         elif not request.user.is_staff:
-            messages.warning(request, "У вас нет прав для достижения данного ресурса.")
+            messages.warning(request, FORBIDDEN)
             return redirect('/')
         
-        messages.warning(request, "Это действие требует авторизации!")
+        messages.warning(request, AUTHORIZATION_REQUIRED)
         return redirect('/login')
 
     def post(self, request):
@@ -110,7 +120,7 @@ class PostCreateView(CreateView):
             form = self.form_class(request.POST or None, request.FILES or None)
             if form.is_valid():
 
-                # Fetching data from form
+                # Fetching data from request
                 title = form.cleaned_data['title']
                 text = form.cleaned_data['text']
                 image = form.cleaned_data['image']
@@ -128,11 +138,11 @@ class PostCreateView(CreateView):
                 return redirect('/')
             
             # Case form invalid
-            messages.warning(request, 'Ошибка в передаваемых данных!')
+            messages.warning(request, FORM_INVALID)
             return render(request, 'general_stuff/post_create.html', {'form': form})
         
         # Case forbidden
-        messages.warning(request, 'У вас нет прав для достижения данного ресурса.')
+        messages.warning(request, FORBIDDEN)
         return render(request, 'general_stuff/post-create.html')
     
 
@@ -148,27 +158,49 @@ class PostUpdateView(UpdateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('post-detail', kwargs={'slug': self.object.slug})
-    
+        return reverse(
+            'post-detail',
+            kwargs={
+                'slug': self.object.slug,
+                'tagline': get_object_or_404(models.Tagline, id=1),
+                'dreamteam': models.UserInfo.objects.filter(dream_team=True),
+            }
+        )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         if not self.request.user.is_staff:
-            messages.warning(self.request, 'У вас нет прав на редактирование этой статьи.')
+            messages.warning(self.request, FORBIDDEN)
 
-        context['success_url'] = reverse('post-detail', kwargs={'slug': self.object.slug})
+        context['success_url'] = reverse(
+            'post-detail',
+            kwargs={
+                'slug': self.object.slug,
+                'tagline': get_object_or_404(models.Tagline, id=1),
+                'dreamteam': models.UserInfo.objects.filter(dream_team=True),
+            }
+        )
 
         return context
-    
+
 
 class PostListView(View):
     def get(self, request):
         if request.user.is_staff:
             posts = models.Post.objects.all()
-            return render(request, "general_stuff/posts.html", {"posts": posts})
+            return render(
+                request,
+                "general_stuff/posts.html",
+                {
+                    "posts": posts,
+                    'tagline': get_object_or_404(models.Tagline, id=1),
+                    'dreamteam': models.UserInfo.objects.filter(dream_team=True),
+                }
+            )
 
         # Case forbidden
-        messages.warning(request, "У вас нет прав для достижения данного ресурса.")
+        messages.warning(request, FORBIDDEN)
         return redirect('/', permanent=True)
 
 
@@ -177,7 +209,7 @@ def delete_post(request, slug):
         try:
             post = models.Post.objects.get(slug=slug)
         except Exception:
-            messages.warning(request, "Ресурс не существует!")
+            messages.warning(request, NO_URL)
             return redirect('/', permanent=True)
 
         post.delete()
@@ -185,7 +217,7 @@ def delete_post(request, slug):
         return redirect('/posts', permanent=True)
 
     # Case forbidden
-    messages.warning(request, "У вас нет прав для достижения данного ресурса.")
+    messages.warning(request, FORBIDDEN)
     return redirect("/", permanent=True)
 
 
@@ -205,7 +237,7 @@ class UserProfileView(View):
                     "rest_data": rest_data
                 }
             )
-        messages.warning(request, "Этот контент требует авторизации!")
+        messages.warning(request, AUTHORIZATION_REQUIRED)
         return redirect('/login')
 
 
@@ -214,28 +246,79 @@ class SignUp(View):
         if request.user.is_authenticated:
             messages.warning(request, 'Вы уже в системе!')
             return redirect('/')
-        
+
         form = forms.RegisterForm()
         return render(request, 'registration/sign_up.html', {"form": form})
 
     def post(self, request):
-        form = forms.RegisterForm(request.POST)
+        if not request.user.is_authenticated:
+            form = forms.RegisterForm(request.POST)
 
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
+            if form.is_valid():
+                user = form.save()
+                login(request, user)
 
-            # Creating user info instance
-            userinfo = models.UserInfo(
-                user=user,
-                user_id=user.id,
-            )
-            userinfo.save()
+                # Creating user info instance
+                userinfo = models.UserInfo(
+                    user=user,
+                    user_id=user.id,
+                )
+                userinfo.save()
 
-            # Case success
-            messages.success(request, f'Добро пожаловать, {user}!')
-            return redirect('/', permanent=True)
-        
-        # Case form invalid
-        messages.warning(request, "Ошибка в заполнении формы!")
-        return render(request, 'registration/sign_up.html', {"form": form})
+                # Case success
+                messages.success(request, f'Добро пожаловать, {user}!')
+                return redirect('/', permanent=True)
+            
+            # Case form invalid
+            messages.warning(request, FORM_INVALID)
+            return render(request, 'registration/sign_up.html', {"form": form})
+
+
+class TaglineView(View):
+    form_class = forms.TaglineForm
+    model_class = models.Tagline
+
+    def get(self, request):
+        if request.user.is_staff:
+            try:
+                tagline = get_object_or_404(self.model_class, id=1)
+                return render(request, 'general_stuff/tagline.html', {'form': self.form_class(instance=tagline)})
+            except Exception:
+                return render(request, 'general_stuff/tagline.html', {'form': self.form_class})
+
+        messages.warning(request, FORBIDDEN)
+        return redirect('/')
+
+    def post(self, request):
+        if request.user.is_staff:
+            form = self.form_class(request.POST or None)
+
+            if form.is_valid():
+                
+                # fetching data from request
+                new_title = form.cleaned_data['title']
+                new_text = form.cleaned_data['text']
+                
+                try:
+                    tagline = get_object_or_404(self.model_class, id=1)
+
+                    # saving new data
+                    tagline.title = new_title
+                    tagline.text = new_text
+
+                    # finishing touches                
+                    tagline.save()
+                except Exception:
+                    self.model_class.objects.create(title=new_title, text=new_text)
+
+                messages.success(request, "Да здравствует новое слово!")
+                return redirect('/')
+
+            # case form invalid
+            tagline = get_object_or_404(models.Tagline, id=1)
+            messages.warning(request, FORM_INVALID)
+            return render(request, 'general_stuff/tagline.html', {'form': self.form_class(instance=tagline)})
+
+        # case forbidden
+        messages.warning(request, FORBIDDEN)
+        return redirect('/')

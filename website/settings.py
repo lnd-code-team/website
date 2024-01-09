@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'general_stuff',
     # exeternal
     'crispy_forms',
-    'crispy_bootstrap5'
+    'crispy_bootstrap5',
+    'phonenumber_field',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
