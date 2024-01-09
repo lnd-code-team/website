@@ -34,5 +34,7 @@
         <div class="card-header">{{ tagline.title }}</div>
         <div class="card-body">{{ tagline.text }}</div>
     </div>
+    {% if user.is_staff %}
     <a class="btn btn-primary" href="{% url 'tagline' %}" style="width: 100%;">Встречайте новый слоган!</a>
+    {% endif %}
 </div>
