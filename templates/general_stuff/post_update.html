@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Редактируем пост...
+{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+{% if not request.user.is_staff %}
+    {% include 'messages.html' %}
+{% else %}
+
+<form method="post" enctype="multipart/form-data" action="{% url 'post-update' post.slug %}">
+  {% csrf_token %} {{ form|crispy }}
+
+  <button type="submit" class="btn btn-outline-success" style="margin-bottom: 30%;">Изменить запись</button>
+
+</form>
+
+{% endif %}
+
+{% if success_url %}
+    <a href="{{ success_url }}" style="margin: 1%;">Вернуться назад</a>
+{% endif %}
+
+{% endblock content %}

@@ -1,0 +1,47 @@
+{% extends '../base.html' %}
+
+{% block title %}
+{{ post.title }}
+{% endblock %}
+
+{% block content %}
+
+<div style="margin-bottom: 1%;">
+    {% include 'messages.html' %}
+</div>
+
+<div class="col col-lg-8">
+    <a href="{% url 'home' %}" class="text-decoration-none">← Назад</a>
+    <!-- Post content-->
+    <article>
+        <!-- Post header-->
+        <header class="mb-4">
+            <!-- Post title-->
+            <h1 class="fw-bolder mb-1">{{ post.title }}</h1>
+            <!-- Post meta content-->
+            <div class="text-muted fst-italic mb-2">{{ post.created_at|date:"F j, Y" }}
+                <a class="text-decoration-none" href="{% url 'user-profile' post.author.username %}">{{post.author.username}}</a>
+            </div>
+            {% if user.is_staff %}
+                <a href="{% url 'post-update' post.slug %}" class="btn btn-outline-success">
+                    Править
+                </a>
+                <a href="{% url 'post-delete-confirm' post.slug %}" class="btn btn-outline-danger">
+                    Удалить
+                </a>                                
+            {% endif %}
+        </header>
+        <!-- Preview image figure-->
+        {% if post.image %}
+        <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.image.url }}" alt="..." style="width:90%;" /></figure>
+        {% endif %}
+        <!-- Post content-->
+        <section class="mb-5" style="width: 90%;">
+            <p style="white-space: pre-wrap;">{{ post.text }}</p>
+        </section>
+    </article>
+</div>
+
+{% include "side_widget.html" %}
+
+{% endblock %}

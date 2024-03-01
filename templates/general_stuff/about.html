@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}
+О нас
+{% endblock %}
+
+{% load static %}
+
+{% block content %}
+
+<!-- About 1 - Bootstrap Brain Component -->
+<section class="py-3 py-md-5 py-xl-8">
+    <div class="container">
+      <div class="row gy-3 gy-md-4 gy-lg-0 align-items-lg-center">
+        <div class="col-12 col-lg-6 col-xl-5">
+          <img class="img-fluid rounded" loading="lazy" src="{% static 'assets/ae-art.jpg' %}" alt="">
+        </div>
+        <div class="col-12 col-lg-6 col-xl-7">
+          <div class="row justify-content-xl-center">
+            <div class="col-12 col-xl-11">
+              <h2 class="h1 mb-3">Кто мы?</h2>
+              <p class="lead fs-4 text-secondary mb-3">Мечтаете о проетке, который будет отражением вашего вкуса и индивидуальности? Тогда вам стоит обратиться в LND. 
+                Мы - команда опытных дизайнеров, которые помогут вам создать неповторимый продакшн, который будет манить к вам клиентов долгие годы.</p>
+              <p class="mb-5">Мы работаем с любыми стилями и бюджетами. Мы учитываем все ваши пожелания и создаем дизайн, который будет отвечать вашим потребностям и ожиданиям.
+                Позвоните нам, чтобы получить бесплатную консультацию.
+              </p>
+              <div class="row gy-4 gy-md-0 gx-xxl-5X">
+                <div class="col-12 col-md-6">
+                  <div class="d-flex">
+                    <div class="me-4 text-primary">
+                        <img src="{% static 'assets/phones/phone100.png' %}" alt="" width="32" height="32">
+                    </div>
+                    <div>
+                      <h4 class="mb-3">Позвоните нам!</h4>
+                      <p class="text-secondary mb-0">+998 (91) 012-07-97</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="d-flex">
+                    <div class="me-4 text-primary">
+                        <img src="{% static 'assets/emails/email96.png' %}" alt="" width="32" height="32">
+                    </div>
+                    <div>
+                      <h4 class="mb-3">Или напишите :D</h4>
+                      <p class="text-secondary mb-0">Xaise@list.ru</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+{% endblock %}

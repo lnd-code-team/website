@@ -1,0 +1,44 @@
+{% extends '../base.html' %}
+
+{% block title %}
+Подтвердите удаление
+{% endblock %}
+
+{% block content %}
+
+<div style="margin-bottom: 1%;">
+    {% include 'messages.html' %}
+</div>
+
+<a href="{% url 'home' %}" class="text-decoration-none">← Назад</a>
+
+<h1 class="fw-bolder mb-1" style="font-style: italic;">Вы уверены что хотите удалить этот пост?</h1>
+
+<div class="col-lg-6" style="margin-bottom: 50px;">
+    <!-- Post content-->
+    <article>
+        <!-- Post header-->
+        <header class="mb-4">
+            <!-- Post title-->
+            <h1 class="fw-bolder mb-1">{{ post.title|truncatewords:10|truncatechars:50 }}</h1>
+            <!-- Post meta content-->
+            <div class="text-muted fst-italic mb-2">{{ post.created_at|date:"F j, Y" }}
+              <a class="text-decoration-none" href="{% url 'user-profile' post.author.username %}">{{ post.author.username }}</a>
+            </div>
+        </header>
+        <!-- Preview image figure-->
+        {% if post.image %}
+        <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.image.url }}" alt="..." style="height: 325px;" /></figure>
+        {% endif %}
+        <!-- Post content-->
+        <section class="mb-5">
+            <p class="col-lg-10" style="width: 90%;">{{ post.text|truncatewords:10|truncatechars:50 }}</p>
+        </section>
+        {% if user.is_staff %}
+            <a href="{% url 'post-delete' post.slug 1 %}" class="btn btn-outline-danger">
+                Удалить
+            </a>                                
+        {% endif %}
+    </article>
+</div>
+{% endblock %}

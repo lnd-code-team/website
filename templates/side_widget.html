@@ -1,0 +1,42 @@
+<!-- Side widgets-->
+<div class="col col-lg-4" style="margin-bottom: 5%;">
+    <!-- Search widget-->
+    <div class="card mb-4">
+        <div class="card-header">Поиск</div>
+        <div class="card-body">
+            <form action="{% url 'home' %}" method="GET">
+                <div class="input-group">
+                    <input class="form-control" type="text" name="q" placeholder="Введите запрос..." aria-label="Enter search term..." aria-describedby="button-search" />
+                    <button class="btn btn-outline-primary" id="button-search" type="submit">Искать!</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Dream Team widget-->
+    <div class="card mb-4">
+        <div class="card-header">Dream Team</div>
+        <div class="card-body">
+            <div class="row">
+                {% for teammate in dreamteam %}
+                <div class="col-sm-6">
+                    <ul class="list-unstyled mb-0">
+                        <li>
+                            <a class="text-decoration-none" href="{% url 'user-profile' teammate.user.username %}">
+                                {{ teammate.user.username }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Tagline widget-->
+    <div class="card mb-4">
+        <div class="card-header">{{ tagline.title }}</div>
+        <div class="card-body">{{ tagline.text }}</div>
+    </div>
+    {% if user.is_staff %}
+    <a class="btn btn-outline-primary" href="{% url 'tagline' %}" style="width: 100%;">Встречайте новый Девиз!</a>
+    {% endif %}
+</div>
